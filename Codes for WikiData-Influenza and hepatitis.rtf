@@ -1,341 +1,252 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2758
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Roman;\f1\fmodern\fcharset0 Courier;\f2\fnil\fcharset0 Menlo-Regular;
+Setting up Neo4j:
+
+CREATE CONSTRAINT n10s_unique_uri ON (r:Resource)
+ASSERT r.uri IS UNIQUE;
+
+CALL n10s.graphconfig.init({handleVocabUris: "MAP"});
+
+
+SPARQL queries for influenza:
+
+CALL n10s.nsprefixes.add("http://www.wikidata.org/prop/direct/", "wdt");
+CALL n10s.mapping.add("http://www.wikidata.org/prop/direct/","CHILD_OF");
+
+CALL n10s.nsprefixes.add("http://www.w3.org/2000/01/rdf-schema#", "rdfs");
+CALL n10s.mapping.add("http://www.w3.org/2000/01/rdf-schema#","name");
+
+
+
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
 }
-{\colortbl;\red255\green255\blue255;\red52\green52\blue52;\red189\green198\blue208;\red0\green0\blue0;
-\red252\green99\blue95;\red12\green14\blue18;\red189\green198\blue208;\red150\green204\blue255;\red255\green255\blue255;
-\red128\green0\blue128;\red115\green138\blue4;\red255\green255\blue254;\red38\green38\blue38;\red71\green91\blue98;
-\red165\green119\blue5;\red37\green146\blue134;}
-{\*\expandedcolortbl;;\cssrgb\c26667\c26667\c26667;\cssrgb\c78824\c81961\c85098;\cssrgb\c0\c0\c0;
-\cssrgb\c100000\c48235\c44706;\cssrgb\c5098\c6667\c9020;\cssrgb\c78824\c81961\c85098;\cssrgb\c64706\c83922\c100000;\cssrgb\c100000\c100000\c100000;
-\csgenericrgb\c50001\c0\c50001;\cssrgb\c52157\c60000\c0;\cssrgb\c100000\c100000\c99608;\cssrgb\c20000\c20000\c20000;\cssrgb\c34510\c43137\c45882;
-\cssrgb\c70980\c53725\c0;\cssrgb\c16471\c63137\c59608;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\deftab720
-\pard\pardeftab720\partightenfactor0
+WHERE {
+?cat rdfs:label "Alphainfluenzavirus"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
 
-\f0\fs45\fsmilli22800 \cf2 \expnd0\expndtw0\kerning0
-Setting up Neo4j:\
-\pard\pardeftab720\partightenfactor0
 
-\fs22\fsmilli11440 \cf3 \cb4 \
-\pard\pardeftab720\partightenfactor0
 
-\f1\fs22\fsmilli11440 \cf5 \cb6 \outl0\strokewidth0 \strokec5 CREATE\cf7 \strokec7  \cf5 \strokec5 CONSTRAINT\cf7 \strokec7  n10s_unique_uri \cf5 \strokec5 ON\cf7 \strokec7  (r:\cf5 \strokec5 Resource\cf7 \strokec7 )\
-\cf5 \strokec5 ASSERT\cf7 \strokec7  r.uri \cf5 \strokec5 IS\cf7 \strokec7  \cf5 \strokec5 UNIQUE\cf7 \strokec7 ;\
-\
-\cf5 \strokec5 CALL\cf7 \strokec7  n10s.graphconfig.init(\{handleVocabUris: \cf8 \strokec8 "MAP"\cf7 \strokec7 \});
-\fs20\fsmilli10400 \
-\pard\pardeftab720\partightenfactor0
-
-\f0\fs20\fsmilli10400 \cf3 \cb9 \outl0\strokewidth0 \
-\pard\pardeftab720\sa319\partightenfactor0
-
-\fs45\fsmilli22800 \cf2 \cb1 \
-\pard\tx577\tx1155\tx1733\tx2311\tx2889\tx3467\tx4045\tx4623\tx5201\tx5779\tx6357\tx6935\tx7513\tx8091\tx8669\tx9247\tx9825\tx10403\tx10981\tx11559\tx12137\tx12715\tx13293\tx13871\tx14449\tx15027\tx15605\tx16183\tx16761\tx17339\tx17917\tx18495\tx19072\tx19650\tx20228\tx20806\tx21384\tx21962\tx22540\tx23118\tx23696\tx24274\tx24852\tx25430\tx26008\tx26586\tx27164\tx27742\tx28320\tx28898\tx29476\tx30054\tx30632\tx31210\tx31788\tx32366\tx32944\tx33522\tx34100\tx34678\tx35256\tx35834\tx36412\tx36990\tx37567\tx38145\tx38723\tx39301\tx39879\tx40457\tx41035\tx41613\tx42191\tx42769\tx43347\tx43925\tx44503\tx45081\tx45659\tx46237\tx46815\tx47393\tx47971\tx48549\tx49127\tx49705\tx50283\tx50861\tx51439\tx52017\tx52595\tx53173\tx53751\tx54329\tx54907\tx55485\tx56062\tx56640\tx57218\tx57796\li577\fi-578\partightenfactor0
-
-\f2\fs24 \cf10 \kerning1\expnd0\expndtw0 \CocoaLigature0 SPARQL queries for influenza:\
-\pard\tx577\tx1155\tx1733\tx2311\tx2889\tx3467\tx4045\tx4623\tx5201\tx5779\tx6357\tx6935\tx7513\tx8091\tx8669\tx9247\tx9825\tx10403\tx10981\tx11559\tx12137\tx12715\tx13293\tx13871\tx14449\tx15027\tx15605\tx16183\tx16761\tx17339\tx17917\tx18495\tx19072\tx19650\tx20228\tx20806\tx21384\tx21962\tx22540\tx23118\tx23696\tx24274\tx24852\tx25430\tx26008\tx26586\tx27164\tx27742\tx28320\tx28898\tx29476\tx30054\tx30632\tx31210\tx31788\tx32366\tx32944\tx33522\tx34100\tx34678\tx35256\tx35834\tx36412\tx36990\tx37567\tx38145\tx38723\tx39301\tx39879\tx40457\tx41035\tx41613\tx42191\tx42769\tx43347\tx43925\tx44503\tx45081\tx45659\tx46237\tx46815\tx47393\tx47971\tx48549\tx49127\tx49705\tx50283\tx50861\tx51439\tx52017\tx52595\tx53173\tx53751\tx54329\tx54907\tx55485\tx56062\tx56640\tx57218\tx57796\li577\fi-578\pardirnatural\partightenfactor0
-\cf10 \
-\pard\pardeftab720\partightenfactor0
-
-\f0 \cf11 \cb12 \expnd0\expndtw0\kerning0
-\CocoaLigature1 \outl0\strokewidth0 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 nsprefixes\cf14 \strokec14 .\cf13 \strokec13 add\cf14 \strokec14 (\cf15 \strokec15 "http://www.wikidata.org/prop/direct/"\cf14 \strokec14 ,\cf13 \strokec13  \cf15 \strokec15 "wdt"\cf14 \strokec14 );\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 mapping\cf14 \strokec14 .\cf13 \strokec13 add\cf14 \strokec14 (\cf15 \strokec15 "http://www.wikidata.org/prop/direct/"\cf14 \strokec14 ,\cf15 \strokec15 "CHILD_OF"\cf14 \strokec14 );\cf0 \cb1 \strokec4 \
-\
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 nsprefixes\cf14 \strokec14 .\cf13 \strokec13 add\cf14 \strokec14 (\cf15 \strokec15 "http://www.w3.org/2000/01/rdf-schema#"\cf14 \strokec14 ,\cf13 \strokec13  \cf15 \strokec15 "rdfs"\cf14 \strokec14 );\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 mapping\cf14 \strokec14 .\cf13 \strokec13 add\cf14 \strokec14 (\cf15 \strokec15 "http://www.w3.org/2000/01/rdf-schema#"\cf14 \strokec14 ,\cf15 \strokec15 "name"\cf14 \strokec14 );\cf0 \cb1 \strokec4 \
-\pard\tx577\tx1155\tx1733\tx2311\tx2889\tx3467\tx4045\tx4623\tx5201\tx5779\tx6357\tx6935\tx7513\tx8091\tx8669\tx9247\tx9825\tx10403\tx10981\tx11559\tx12137\tx12715\tx13293\tx13871\tx14449\tx15027\tx15605\tx16183\tx16761\tx17339\tx17917\tx18495\tx19072\tx19650\tx20228\tx20806\tx21384\tx21962\tx22540\tx23118\tx23696\tx24274\tx24852\tx25430\tx26008\tx26586\tx27164\tx27742\tx28320\tx28898\tx29476\tx30054\tx30632\tx31210\tx31788\tx32366\tx32944\tx33522\tx34100\tx34678\tx35256\tx35834\tx36412\tx36990\tx37567\tx38145\tx38723\tx39301\tx39879\tx40457\tx41035\tx41613\tx42191\tx42769\tx43347\tx43925\tx44503\tx45081\tx45659\tx46237\tx46815\tx47393\tx47971\tx48549\tx49127\tx49705\tx50283\tx50861\tx51439\tx52017\tx52595\tx53173\tx53751\tx54329\tx54907\tx55485\tx56062\tx56640\tx57218\tx57796\li577\fi-578\partightenfactor0
-
-\f2 \cf10 \kerning1\expnd0\expndtw0 \CocoaLigature0 \outl0\strokewidth0 \
-\pard\tx577\tx1155\tx1733\tx2311\tx2889\tx3467\tx4045\tx4623\tx5201\tx5779\tx6357\tx6935\tx7513\tx8091\tx8669\tx9247\tx9825\tx10403\tx10981\tx11559\tx12137\tx12715\tx13293\tx13871\tx14449\tx15027\tx15605\tx16183\tx16761\tx17339\tx17917\tx18495\tx19072\tx19650\tx20228\tx20806\tx21384\tx21962\tx22540\tx23118\tx23696\tx24274\tx24852\tx25430\tx26008\tx26586\tx27164\tx27742\tx28320\tx28898\tx29476\tx30054\tx30632\tx31210\tx31788\tx32366\tx32944\tx33522\tx34100\tx34678\tx35256\tx35834\tx36412\tx36990\tx37567\tx38145\tx38723\tx39301\tx39879\tx40457\tx41035\tx41613\tx42191\tx42769\tx43347\tx43925\tx44503\tx45081\tx45659\tx46237\tx46815\tx47393\tx47971\tx48549\tx49127\tx49705\tx50283\tx50861\tx51439\tx52017\tx52595\tx53173\tx53751\tx54329\tx54907\tx55485\tx56062\tx56640\tx57218\tx57796\li577\fi-578\pardirnatural\partightenfactor0
-\cf10 \
-\
-\
-\pard\pardeftab720\partightenfactor0
-
-\f0 \cf11 \cb12 \expnd0\expndtw0\kerning0
-\CocoaLigature1 \outl0\strokewidth0 \strokec11 WITH\cf13 \strokec13  'CONSTRUCT \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 WHERE\cf13 \strokec13  \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf15 \strokec15 "Alphainfluenzavirus"\cf14 \strokec14 @\cf13 \strokec13 en \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 catName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat wdt\cf14 \strokec14 :\cf13 \strokec13 P171\cf14 \strokec14 +\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 cat \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 subCatName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf13 \strokec13 ' \cf11 \strokec11 AS\cf13 \strokec13  query\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 rdf\cf14 \strokec14 .\cf13 \strokec13 import\cf14 \strokec14 .\cf13 \strokec13 fetch\cf14 \strokec14 (\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "https://query.wikidata.org/sparql?query="\cf13 \strokec13  \cf14 \strokec14 +\cf13 \strokec13  apoc\cf14 \strokec14 .\cf13 \strokec13 text\cf14 \strokec14 .\cf13 \strokec13 urlencode\cf14 \strokec14 (\cf13 \strokec13 query\cf14 \strokec14 ),\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "JSON-LD"\cf14 \strokec14 ,\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \{\cf13 \strokec13  headerParams\cf14 \strokec14 :\cf13 \strokec13  \cf14 \strokec14 \{\cf13 \strokec13  Accept\cf14 \strokec14 :\cf13 \strokec13  \cf15 \strokec15 "application/ld+json"\cf14 \strokec14 \}\})\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 YIELD\cf13 \strokec13  triplesLoaded\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 RETURN\cf13 \strokec13  triplesLoaded\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\pard\tx577\tx1155\tx1733\tx2311\tx2889\tx3467\tx4045\tx4623\tx5201\tx5779\tx6357\tx6935\tx7513\tx8091\tx8669\tx9247\tx9825\tx10403\tx10981\tx11559\tx12137\tx12715\tx13293\tx13871\tx14449\tx15027\tx15605\tx16183\tx16761\tx17339\tx17917\tx18495\tx19072\tx19650\tx20228\tx20806\tx21384\tx21962\tx22540\tx23118\tx23696\tx24274\tx24852\tx25430\tx26008\tx26586\tx27164\tx27742\tx28320\tx28898\tx29476\tx30054\tx30632\tx31210\tx31788\tx32366\tx32944\tx33522\tx34100\tx34678\tx35256\tx35834\tx36412\tx36990\tx37567\tx38145\tx38723\tx39301\tx39879\tx40457\tx41035\tx41613\tx42191\tx42769\tx43347\tx43925\tx44503\tx45081\tx45659\tx46237\tx46815\tx47393\tx47971\tx48549\tx49127\tx49705\tx50283\tx50861\tx51439\tx52017\tx52595\tx53173\tx53751\tx54329\tx54907\tx55485\tx56062\tx56640\tx57218\tx57796\li577\fi-578\pardirnatural\partightenfactor0
-
-\f2 \cf10 \kerning1\expnd0\expndtw0 \CocoaLigature0 \outl0\strokewidth0 \
-\
-\
-\pard\pardeftab720\partightenfactor0
-
-\f0 \cf11 \cb12 \expnd0\expndtw0\kerning0
-\CocoaLigature1 \outl0\strokewidth0 \strokec11 WITH\cf13 \strokec13  'CONSTRUCT \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 WHERE\cf13 \strokec13  \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf15 \strokec15 "Betainfluenzavirus"\cf14 \strokec14 @\cf13 \strokec13 en \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 catName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat wdt\cf14 \strokec14 :\cf13 \strokec13 P171\cf14 \strokec14 +\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 cat \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 subCatName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf13 \strokec13 ' \cf11 \strokec11 AS\cf13 \strokec13  query\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 rdf\cf14 \strokec14 .\cf13 \strokec13 import\cf14 \strokec14 .\cf13 \strokec13 fetch\cf14 \strokec14 (\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "https://query.wikidata.org/sparql?query="\cf13 \strokec13  \cf14 \strokec14 +\cf13 \strokec13  apoc\cf14 \strokec14 .\cf13 \strokec13 text\cf14 \strokec14 .\cf13 \strokec13 urlencode\cf14 \strokec14 (\cf13 \strokec13 query\cf14 \strokec14 ),\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "JSON-LD"\cf14 \strokec14 ,\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \{\cf13 \strokec13  headerParams\cf14 \strokec14 :\cf13 \strokec13  \cf14 \strokec14 \{\cf13 \strokec13  Accept\cf14 \strokec14 :\cf13 \strokec13  \cf15 \strokec15 "application/ld+json"\cf14 \strokec14 \}\})\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 YIELD\cf13 \strokec13  triplesLoaded\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 RETURN\cf13 \strokec13  triplesLoaded\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\pard\tx577\tx1155\tx1733\tx2311\tx2889\tx3467\tx4045\tx4623\tx5201\tx5779\tx6357\tx6935\tx7513\tx8091\tx8669\tx9247\tx9825\tx10403\tx10981\tx11559\tx12137\tx12715\tx13293\tx13871\tx14449\tx15027\tx15605\tx16183\tx16761\tx17339\tx17917\tx18495\tx19072\tx19650\tx20228\tx20806\tx21384\tx21962\tx22540\tx23118\tx23696\tx24274\tx24852\tx25430\tx26008\tx26586\tx27164\tx27742\tx28320\tx28898\tx29476\tx30054\tx30632\tx31210\tx31788\tx32366\tx32944\tx33522\tx34100\tx34678\tx35256\tx35834\tx36412\tx36990\tx37567\tx38145\tx38723\tx39301\tx39879\tx40457\tx41035\tx41613\tx42191\tx42769\tx43347\tx43925\tx44503\tx45081\tx45659\tx46237\tx46815\tx47393\tx47971\tx48549\tx49127\tx49705\tx50283\tx50861\tx51439\tx52017\tx52595\tx53173\tx53751\tx54329\tx54907\tx55485\tx56062\tx56640\tx57218\tx57796\li577\fi-578\pardirnatural\partightenfactor0
-
-\f2 \cf10 \kerning1\expnd0\expndtw0 \CocoaLigature0 \outl0\strokewidth0 \
-\
-\pard\pardeftab720\partightenfactor0
-
-\f0 \cf11 \cb12 \expnd0\expndtw0\kerning0
-\CocoaLigature1 \outl0\strokewidth0 \strokec11 WITH\cf13 \strokec13  'CONSTRUCT \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 WHERE\cf13 \strokec13  \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf15 \strokec15 "Gammainfluenzavirus"\cf14 \strokec14 @\cf13 \strokec13 en \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 catName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat wdt\cf14 \strokec14 :\cf13 \strokec13 P171\cf14 \strokec14 +\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 cat \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 subCatName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf13 \strokec13 ' \cf11 \strokec11 AS\cf13 \strokec13  query\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 rdf\cf14 \strokec14 .\cf13 \strokec13 import\cf14 \strokec14 .\cf13 \strokec13 fetch\cf14 \strokec14 (\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "https://query.wikidata.org/sparql?query="\cf13 \strokec13  \cf14 \strokec14 +\cf13 \strokec13  apoc\cf14 \strokec14 .\cf13 \strokec13 text\cf14 \strokec14 .\cf13 \strokec13 urlencode\cf14 \strokec14 (\cf13 \strokec13 query\cf14 \strokec14 ),\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "JSON-LD"\cf14 \strokec14 ,\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \{\cf13 \strokec13  headerParams\cf14 \strokec14 :\cf13 \strokec13  \cf14 \strokec14 \{\cf13 \strokec13  Accept\cf14 \strokec14 :\cf13 \strokec13  \cf15 \strokec15 "application/ld+json"\cf14 \strokec14 \}\})\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 YIELD\cf13 \strokec13  triplesLoaded\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 RETURN\cf13 \strokec13  triplesLoaded\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\pard\tx577\tx1155\tx1733\tx2311\tx2889\tx3467\tx4045\tx4623\tx5201\tx5779\tx6357\tx6935\tx7513\tx8091\tx8669\tx9247\tx9825\tx10403\tx10981\tx11559\tx12137\tx12715\tx13293\tx13871\tx14449\tx15027\tx15605\tx16183\tx16761\tx17339\tx17917\tx18495\tx19072\tx19650\tx20228\tx20806\tx21384\tx21962\tx22540\tx23118\tx23696\tx24274\tx24852\tx25430\tx26008\tx26586\tx27164\tx27742\tx28320\tx28898\tx29476\tx30054\tx30632\tx31210\tx31788\tx32366\tx32944\tx33522\tx34100\tx34678\tx35256\tx35834\tx36412\tx36990\tx37567\tx38145\tx38723\tx39301\tx39879\tx40457\tx41035\tx41613\tx42191\tx42769\tx43347\tx43925\tx44503\tx45081\tx45659\tx46237\tx46815\tx47393\tx47971\tx48549\tx49127\tx49705\tx50283\tx50861\tx51439\tx52017\tx52595\tx53173\tx53751\tx54329\tx54907\tx55485\tx56062\tx56640\tx57218\tx57796\li577\fi-578\partightenfactor0
-
-\f2 \cf10 \kerning1\expnd0\expndtw0 \CocoaLigature0 \outl0\strokewidth0 \
-\
-\pard\pardeftab720\partightenfactor0
-
-\f0 \cf11 \cb12 \expnd0\expndtw0\kerning0
-\CocoaLigature1 \outl0\strokewidth0 \strokec11 WITH\cf13 \strokec13  'CONSTRUCT \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 WHERE\cf13 \strokec13  \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf15 \strokec15 "Deltainfluenzavirus"\cf14 \strokec14 @\cf13 \strokec13 en \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 catName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat wdt\cf14 \strokec14 :\cf13 \strokec13 P171\cf14 \strokec14 +\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 cat \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 subCatName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf13 \strokec13 ' \cf11 \strokec11 AS\cf13 \strokec13  query\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 rdf\cf14 \strokec14 .\cf13 \strokec13 import\cf14 \strokec14 .\cf13 \strokec13 fetch\cf14 \strokec14 (\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "https://query.wikidata.org/sparql?query="\cf13 \strokec13  \cf14 \strokec14 +\cf13 \strokec13  apoc\cf14 \strokec14 .\cf13 \strokec13 text\cf14 \strokec14 .\cf13 \strokec13 urlencode\cf14 \strokec14 (\cf13 \strokec13 query\cf14 \strokec14 ),\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "JSON-LD"\cf14 \strokec14 ,\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \{\cf13 \strokec13  headerParams\cf14 \strokec14 :\cf13 \strokec13  \cf14 \strokec14 \{\cf13 \strokec13  Accept\cf14 \strokec14 :\cf13 \strokec13  \cf15 \strokec15 "application/ld+json"\cf14 \strokec14 \}\})\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 YIELD\cf13 \strokec13  triplesLoaded\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 RETURN\cf13 \strokec13  triplesLoaded\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\pard\tx577\tx1155\tx1733\tx2311\tx2889\tx3467\tx4045\tx4623\tx5201\tx5779\tx6357\tx6935\tx7513\tx8091\tx8669\tx9247\tx9825\tx10403\tx10981\tx11559\tx12137\tx12715\tx13293\tx13871\tx14449\tx15027\tx15605\tx16183\tx16761\tx17339\tx17917\tx18495\tx19072\tx19650\tx20228\tx20806\tx21384\tx21962\tx22540\tx23118\tx23696\tx24274\tx24852\tx25430\tx26008\tx26586\tx27164\tx27742\tx28320\tx28898\tx29476\tx30054\tx30632\tx31210\tx31788\tx32366\tx32944\tx33522\tx34100\tx34678\tx35256\tx35834\tx36412\tx36990\tx37567\tx38145\tx38723\tx39301\tx39879\tx40457\tx41035\tx41613\tx42191\tx42769\tx43347\tx43925\tx44503\tx45081\tx45659\tx46237\tx46815\tx47393\tx47971\tx48549\tx49127\tx49705\tx50283\tx50861\tx51439\tx52017\tx52595\tx53173\tx53751\tx54329\tx54907\tx55485\tx56062\tx56640\tx57218\tx57796\li577\fi-578\partightenfactor0
-
-\f2 \cf10 \kerning1\expnd0\expndtw0 \CocoaLigature0 \outl0\strokewidth0 \
-\pard\pardeftab720\partightenfactor0
-
-\f0 \cf11 \cb12 \expnd0\expndtw0\kerning0
-\CocoaLigature1 \outl0\strokewidth0 \strokec11 WITH\cf13 \strokec13  'CONSTRUCT \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \cb12 \strokec14 \}\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf11 \cb12 \strokec11 WHERE\cf13 \strokec13  \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf15 \strokec15 "Orthomyxoviridae"\cf14 \strokec14 @\cf13 \strokec13 en \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 catName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat wdt\cf14 \strokec14 :\cf13 \strokec13 P171\cf14 \strokec14 +\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 cat \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 subCatName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \cb12 \strokec14 \}\cf13 \strokec13 ' \cf11 \strokec11 AS\cf13 \strokec13  query\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 rdf\cf14 \strokec14 .\cf13 \strokec13 import\cf14 \strokec14 .\cf13 \strokec13 fetch\cf14 \strokec14 (\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf15 \cb12 \strokec15 "https://query.wikidata.org/sparql?query="\cf13 \strokec13  \cf14 \strokec14 +\cf13 \strokec13  apoc\cf14 \strokec14 .\cf13 \strokec13 text\cf14 \strokec14 .\cf13 \strokec13 urlencode\cf14 \strokec14 (\cf13 \strokec13 query\cf14 \strokec14 ),\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "JSON-LD"\cf14 \strokec14 ,\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \cb12 \strokec14 \{\cf13 \strokec13  headerParams\cf14 \strokec14 :\cf13 \strokec13  \cf14 \strokec14 \{\cf13 \strokec13  Accept\cf14 \strokec14 :\cf13 \strokec13  \cf15 \strokec15 "application/ld+json"\cf14 \strokec14 \}\})\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf11 \cb12 \strokec11 YIELD\cf13 \strokec13  triplesLoaded\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 RETURN\cf13 \strokec13  triplesLoaded\cf14 \strokec14 ;\
-\
-\
-\pard\tx577\tx1155\tx1733\tx2311\tx2889\tx3467\tx4045\tx4623\tx5201\tx5779\tx6357\tx6935\tx7513\tx8091\tx8669\tx9247\tx9825\tx10403\tx10981\tx11559\tx12137\tx12715\tx13293\tx13871\tx14449\tx15027\tx15605\tx16183\tx16761\tx17339\tx17917\tx18495\tx19072\tx19650\tx20228\tx20806\tx21384\tx21962\tx22540\tx23118\tx23696\tx24274\tx24852\tx25430\tx26008\tx26586\tx27164\tx27742\tx28320\tx28898\tx29476\tx30054\tx30632\tx31210\tx31788\tx32366\tx32944\tx33522\tx34100\tx34678\tx35256\tx35834\tx36412\tx36990\tx37567\tx38145\tx38723\tx39301\tx39879\tx40457\tx41035\tx41613\tx42191\tx42769\tx43347\tx43925\tx44503\tx45081\tx45659\tx46237\tx46815\tx47393\tx47971\tx48549\tx49127\tx49705\tx50283\tx50861\tx51439\tx52017\tx52595\tx53173\tx53751\tx54329\tx54907\tx55485\tx56062\tx56640\tx57218\tx57796\li577\fi-578\partightenfactor0
-
-\f2 \cf10 \cb1 \kerning1\expnd0\expndtw0 \CocoaLigature0 \outl0\strokewidth0 SPARQL queries for hepatitis:
-\f0 \cf14 \cb12 \expnd0\expndtw0\kerning0
-\CocoaLigature1 \outl0\strokewidth0 \strokec14 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \
-\pard\pardeftab720\partightenfactor0
-\cf11 \cb12 \strokec11 WITH\cf13 \strokec13  'CONSTRUCT \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 WHERE\cf13 \strokec13  \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf15 \strokec15 "Hepeviridae"\cf14 \strokec14 @\cf13 \strokec13 en \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 catName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat wdt\cf14 \strokec14 :\cf13 \strokec13 P171\cf14 \strokec14 +\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 cat \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 subCatName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf13 \strokec13 ' \cf11 \strokec11 AS\cf13 \strokec13  query\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 rdf\cf14 \strokec14 .\cf13 \strokec13 import\cf14 \strokec14 .\cf13 \strokec13 fetch\cf14 \strokec14 (\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "https://query.wikidata.org/sparql?query="\cf13 \strokec13  \cf14 \strokec14 +\cf13 \strokec13  apoc\cf14 \strokec14 .\cf13 \strokec13 text\cf14 \strokec14 .\cf13 \strokec13 urlencode\cf14 \strokec14 (\cf13 \strokec13 query\cf14 \strokec14 ),\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "JSON-LD"\cf14 \strokec14 ,\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \{\cf13 \strokec13  headerParams\cf14 \strokec14 :\cf13 \strokec13  \cf14 \strokec14 \{\cf13 \strokec13  Accept\cf14 \strokec14 :\cf13 \strokec13  \cf15 \strokec15 "application/ld+json"\cf14 \strokec14 \}\})\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 YIELD\cf13 \strokec13  triplesLoaded\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 RETURN\cf13 \strokec13  triplesLoaded\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \cb12 \strokec14 \
-\
-\pard\pardeftab720\partightenfactor0
-\cf11 \cb12 \strokec11 WITH\cf13 \strokec13  'CONSTRUCT \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 WHERE\cf13 \strokec13  \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf15 \strokec15 "Incertae sedis"\cf14 \strokec14 @\cf13 \strokec13 en \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 catName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat wdt\cf14 \strokec14 :\cf13 \strokec13 P171\cf14 \strokec14 +\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 cat \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 subCatName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf13 \strokec13 ' \cf11 \strokec11 AS\cf13 \strokec13  query\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 rdf\cf14 \strokec14 .\cf13 \strokec13 import\cf14 \strokec14 .\cf13 \strokec13 fetch\cf14 \strokec14 (\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "https://query.wikidata.org/sparql?query="\cf13 \strokec13  \cf14 \strokec14 +\cf13 \strokec13  apoc\cf14 \strokec14 .\cf13 \strokec13 text\cf14 \strokec14 .\cf13 \strokec13 urlencode\cf14 \strokec14 (\cf13 \strokec13 query\cf14 \strokec14 ),\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "JSON-LD"\cf14 \strokec14 ,\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \{\cf13 \strokec13  headerParams\cf14 \strokec14 :\cf13 \strokec13  \cf14 \strokec14 \{\cf13 \strokec13  Accept\cf14 \strokec14 :\cf13 \strokec13  \cf15 \strokec15 "application/ld+json"\cf14 \strokec14 \}\})\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 YIELD\cf13 \strokec13  triplesLoaded\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 RETURN\cf13 \strokec13  triplesLoaded\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \cb12 \strokec14 \
-\pard\pardeftab720\partightenfactor0
-\cf11 \cb12 \strokec11 WITH\cf13 \strokec13  'CONSTRUCT \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 WHERE\cf13 \strokec13  \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf15 \strokec15 "Flaviviridae"\cf14 \strokec14 @\cf13 \strokec13 en \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 catName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat wdt\cf14 \strokec14 :\cf13 \strokec13 P171\cf14 \strokec14 +\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 cat \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 subCatName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf13 \strokec13 ' \cf11 \strokec11 AS\cf13 \strokec13  query\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 rdf\cf14 \strokec14 .\cf13 \strokec13 import\cf14 \strokec14 .\cf13 \strokec13 fetch\cf14 \strokec14 (\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "https://query.wikidata.org/sparql?query="\cf13 \strokec13  \cf14 \strokec14 +\cf13 \strokec13  apoc\cf14 \strokec14 .\cf13 \strokec13 text\cf14 \strokec14 .\cf13 \strokec13 urlencode\cf14 \strokec14 (\cf13 \strokec13 query\cf14 \strokec14 ),\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "JSON-LD"\cf14 \strokec14 ,\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \{\cf13 \strokec13  headerParams\cf14 \strokec14 :\cf13 \strokec13  \cf14 \strokec14 \{\cf13 \strokec13  Accept\cf14 \strokec14 :\cf13 \strokec13  \cf15 \strokec15 "application/ld+json"\cf14 \strokec14 \}\})\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 YIELD\cf13 \strokec13  triplesLoaded\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 RETURN\cf13 \strokec13  triplesLoaded\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \cb12 \strokec14 \
-\pard\pardeftab720\partightenfactor0
-\cf11 \cb12 \strokec11 WITH\cf13 \strokec13  'CONSTRUCT \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 WHERE\cf13 \strokec13  \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf15 \strokec15 "Hepadnaviridae"\cf14 \strokec14 @\cf13 \strokec13 en \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 catName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat wdt\cf14 \strokec14 :\cf13 \strokec13 P171\cf14 \strokec14 +\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 cat \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 subCatName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf13 \strokec13 ' \cf11 \strokec11 AS\cf13 \strokec13  query\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 rdf\cf14 \strokec14 .\cf13 \strokec13 import\cf14 \strokec14 .\cf13 \strokec13 fetch\cf14 \strokec14 (\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "https://query.wikidata.org/sparql?query="\cf13 \strokec13  \cf14 \strokec14 +\cf13 \strokec13  apoc\cf14 \strokec14 .\cf13 \strokec13 text\cf14 \strokec14 .\cf13 \strokec13 urlencode\cf14 \strokec14 (\cf13 \strokec13 query\cf14 \strokec14 ),\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "JSON-LD"\cf14 \strokec14 ,\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \{\cf13 \strokec13  headerParams\cf14 \strokec14 :\cf13 \strokec13  \cf14 \strokec14 \{\cf13 \strokec13  Accept\cf14 \strokec14 :\cf13 \strokec13  \cf15 \strokec15 "application/ld+json"\cf14 \strokec14 \}\})\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 YIELD\cf13 \strokec13  triplesLoaded\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 RETURN\cf13 \strokec13  triplesLoaded\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \cb12 \strokec14 \
-\pard\pardeftab720\partightenfactor0
-\cf11 \cb12 \strokec11 WITH\cf13 \strokec13  'CONSTRUCT \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 WHERE\cf13 \strokec13  \cf14 \strokec14 \{\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf15 \strokec15 "Picornaviridae"\cf14 \strokec14 @\cf13 \strokec13 en \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 cat rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 catName \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 catName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 ?\cf13 \strokec13 subCat wdt\cf14 \strokec14 :\cf13 \strokec13 P171\cf14 \strokec14 +\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 cat \cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 wdt\cf14 \strokec14 :\cf13 \strokec13 P171 \cf14 \strokec14 ?\cf13 \strokec13 parentCat\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\cf13 \cb12 \strokec13 rdfs\cf14 \strokec14 :\cf11 \strokec11 label\cf13 \strokec13  \cf14 \strokec14 ?\cf13 \strokec13 subCatName\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 filter\cf14 \strokec14 (\cf13 \strokec13 lang\cf14 \strokec14 (?\cf13 \strokec13 subCatName\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 =\cf13 \strokec13  \cf15 \strokec15 "en"\cf14 \strokec14 )\cf13 \strokec13  \cf14 \strokec14 .\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \}\cf13 \strokec13 ' \cf11 \strokec11 AS\cf13 \strokec13  query\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 CALL\cf13 \strokec13  n10s\cf14 \strokec14 .\cf13 \strokec13 rdf\cf14 \strokec14 .\cf13 \strokec13 import\cf14 \strokec14 .\cf13 \strokec13 fetch\cf14 \strokec14 (\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "https://query.wikidata.org/sparql?query="\cf13 \strokec13  \cf14 \strokec14 +\cf13 \strokec13  apoc\cf14 \strokec14 .\cf13 \strokec13 text\cf14 \strokec14 .\cf13 \strokec13 urlencode\cf14 \strokec14 (\cf13 \strokec13 query\cf14 \strokec14 ),\cf0 \cb1 \strokec4 \
-\cf15 \cb12 \strokec15 "JSON-LD"\cf14 \strokec14 ,\cf0 \cb1 \strokec4 \
-\cf14 \cb12 \strokec14 \{\cf13 \strokec13  headerParams\cf14 \strokec14 :\cf13 \strokec13  \cf14 \strokec14 \{\cf13 \strokec13  Accept\cf14 \strokec14 :\cf13 \strokec13  \cf15 \strokec15 "application/ld+json"\cf14 \strokec14 \}\})\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 YIELD\cf13 \strokec13  triplesLoaded\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 RETURN\cf13 \strokec13  triplesLoaded\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\pard\pardeftab720\partightenfactor0
-\cf14 \cb12 \strokec14 \
-\
-\pard\pardeftab720\partightenfactor0
-\cf0 \cb1 \strokec4 \
-\
-\pard\pardeftab720\partightenfactor0
-\cf11 \cb12 \strokec11 MATCH\cf13 \strokec13  \cf14 \strokec14 (\cf13 \strokec13 n\cf14 \strokec14 :\cf13 \strokec13 Resource\cf14 \strokec14 )\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 SET\cf13 \strokec13  n\cf14 \strokec14 :\cf13 \strokec13 Virus\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\
-\cf11 \cb12 \strokec11 MATCH\cf13 \strokec13  \cf14 \strokec14 (\cf13 \strokec13 v\cf14 \strokec14 :\cf13 \strokec13 Virus\cf14 \strokec14 )<-[\cf13 \strokec13 co\cf14 \strokec14 :\cf13 \strokec13 CHILD_OF\cf14 \strokec14 *\cf16 \cb12 \strokec16 2\cf14 \cb12 \strokec14 ..]-(\cf13 \strokec13 child\cf14 \strokec14 )-[\cf13 \strokec13 shortcut\cf14 \strokec14 :\cf13 \strokec13 CHILD_OF\cf14 \strokec14 ]->(\cf13 \strokec13 v\cf14 \strokec14 )\cf0 \cb1 \strokec4 \
-\cf11 \cb12 \strokec11 DELETE\cf13 \strokec13  shortcut\cf14 \strokec14 ;\cf0 \cb1 \strokec4 \
-\
-\
-\
-\
-\
-\
-\
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
 }
+WHERE {
+?cat rdfs:label "Betainfluenzavirus"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Gammainfluenzavirus"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Deltainfluenzavirus"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Orthomyxoviridae"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+
+SPARQL queries for hepatitis:
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Hepeviridae"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Incertae sedis"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Flaviviridae"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Hepadnaviridae"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Picornaviridae"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+
+
+
+MATCH (n:Resource)
+SET n:Virus;
+
+MATCH (v:Virus)<-[co:CHILD_OF*2..]-(child)-[shortcut:CHILD_OF]->(v)
+DELETE shortcut;
+
+
+
+
+
+
+
