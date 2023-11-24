@@ -1,0 +1,252 @@
+Setting up Neo4j:
+
+CREATE CONSTRAINT n10s_unique_uri ON (r:Resource)
+ASSERT r.uri IS UNIQUE;
+
+CALL n10s.graphconfig.init({handleVocabUris: "MAP"});
+
+
+SPARQL queries for influenza:
+
+CALL n10s.nsprefixes.add("http://www.wikidata.org/prop/direct/", "wdt");
+CALL n10s.mapping.add("http://www.wikidata.org/prop/direct/","CHILD_OF");
+
+CALL n10s.nsprefixes.add("http://www.w3.org/2000/01/rdf-schema#", "rdfs");
+CALL n10s.mapping.add("http://www.w3.org/2000/01/rdf-schema#","name");
+
+
+
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Alphainfluenzavirus"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Betainfluenzavirus"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Gammainfluenzavirus"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Deltainfluenzavirus"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Orthomyxoviridae"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+
+SPARQL queries for hepatitis:
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Hepeviridae"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Incertae sedis"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Flaviviridae"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Hepadnaviridae"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+WITH 'CONSTRUCT {
+?cat rdfs:label ?catName .
+?subCat rdfs:label ?subCatName ;
+wdt:P171 ?parentCat .
+}
+WHERE {
+?cat rdfs:label "Picornaviridae"@en .
+?cat rdfs:label ?catName .
+filter(lang(?catName) = "en") .
+?subCat wdt:P171+ ?cat ;
+wdt:P171 ?parentCat;
+rdfs:label ?subCatName
+filter(lang(?subCatName) = "en") .
+}' AS query
+CALL n10s.rdf.import.fetch(
+"https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(query),
+"JSON-LD",
+{ headerParams: { Accept: "application/ld+json"}})
+YIELD triplesLoaded
+RETURN triplesLoaded;
+
+
+
+
+MATCH (n:Resource)
+SET n:Virus;
+
+MATCH (v:Virus)<-[co:CHILD_OF*2..]-(child)-[shortcut:CHILD_OF]->(v)
+DELETE shortcut;
+
+
+
+
+
+
+
