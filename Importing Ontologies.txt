@@ -1,0 +1,19 @@
+Configuring n10s
+Let’s now configure n10s so that it’s ready to import some data. 
+We need to create a unique constraint on :Resource(uri) 
+and then call the n10s.graphconfig.init procedure to configure the library:  
+=================================================
+CALL n10s.graphconfig.init();
+CREATE CONSTRAINT n10s_unique_uri ON (r:Resource)
+ASSERT r.uri IS UNIQUE;
+call n10s.graphconfig.init();
+call n10s.graphconfig.init( {  handleMultival: "ARRAY" });
+Call n10s.graphconfig.init({handleVocabUris: "MAP"});
+call n10s.graphconfig.init();
+call n10s.graphconfig.set( { keepLangTag: true, handleRDFTypes: "LABELS_AND_NODES" });
+
+ 
+call n10s.rdf.import.fetch("file:///C:\\Neo4j_Home\\DOID.xrdf", "RDF/XML");
+call n10s.rdf.import.fetch("file:///C:\\Neo4j_Home\\Influenza.xrdf", "RDF/XML");
+call n10s.rdf.import.fetch("file:///C:\\Neo4j_Home\\hepatitis.xrdf", "RDF/XML");
+
